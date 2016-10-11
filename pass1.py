@@ -11,9 +11,11 @@ def pass1(program):
 		ins=re.split('[ 	\n]',line)
 		#If label field is not empty,check in SYMTAB.
 		if ins[0]!='':
-			symflag=checkSYMTAB(ins[0],ins[1])
-		if symflag==False:
+			symflag=checkSYMTAB(ins[0],ins[1],ins[2])
+		if symflag==1:
 			#DIspaly error(Duplicate symbol)
+		elif symflag==2:
+			#display error(Invalid Operand)
 
 		#Check for OPCODE.
 		opflag=checkOPCODE(ins[1])
@@ -26,4 +28,4 @@ def pass1(program):
 		else:
 			#Write the intermediate file. 
 			#(Format:lineno address label opcode oprerands machnecode_of_OPCODE format length). and store the same thing in something for PASS-2.
-
+		lineno+=1
