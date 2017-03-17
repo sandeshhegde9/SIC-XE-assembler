@@ -4,6 +4,7 @@
 #Writes the intermediate file. 
 
 import re
+import pass2
 
 #Global Declaration.
 SYMTAB={}
@@ -11,7 +12,7 @@ OPTAB={'AD':'18','ADDF':'58','ADDR':'90','AND':'40','CLEAR':'B4','COMP':'28','CO
 LOCTR=0
 prog=[]
 
-#The 'checkSYMTAB()' function. checks if a symbol i spresent in the Global SYMTAB.
+#The 'checkSYMTAB()' function. checks if a symbol is present in the Global SYMTAB.
 #If already present returns error. else inserts symbol and its address to SYMTAB.
 
 def checkSYMTAB(symbol,opcode,operator):
@@ -78,7 +79,7 @@ def checkOPCODE(opcode,operand):
 			a[3]=2		#typ2
 		else:
 			a[1]=3+10	
-			a[3]=3	#type 3
+			a[3]=3		#type 3
 	return a
 
 
@@ -141,6 +142,7 @@ def main():
 	f2=open('symtab','w')
 	print SYMTAB
 	print prog
+	pass2.pass2(prog,SYMTAB)
 	for key in SYMTAB:
 		f2.write(key+'\t'+str(SYMTAB[key])+'\n')
 
