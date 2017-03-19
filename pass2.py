@@ -1,7 +1,5 @@
 #Pass-2 of the SIC-XE assebbler. Takes the intermediate format and SYMTAB as input and writes the object file.
 
-<<<<<<< HEAD
-
 #This functions decides all the flags for an instruction. Takes a line of code as input returns a sring 'nixbpe'
 def getFlag(line,disp):
 	n=i=x=b=p=e=0
@@ -29,27 +27,21 @@ def getFlag(line,disp):
 	return flag
 	
 	
-=======
->>>>>>> fe777b66e49b8b8b0b16a5caccab7379dbe0125b
 def pass2(prog,SYMTAB):
 	for i in range(len(prog)):
 
 		#If the instruction has a machine code convert to 6 bit binary.
 		if prog[i][4]!='':
 			bin_str= bin(int(prog[i][4],16))[2:].zfill(len(prog[i][4]*4))[:6]
-<<<<<<< HEAD
 			print bin_str
 
 		#Flag needs to be checked and flag needs to be aded to bin_string..
 			flags=getFlag(prog[i],'p')
 			bin_str+=flags
 			print bin_str
-=======
-			print bin_st
 
 		#Flag needs to be checked and flag needs to be aded to binstring..
 		#I have this code in my laptop.. Just have to copy paste.
->>>>>>> fe777b66e49b8b8b0b16a5caccab7379dbe0125b
 		#
 
 		#Check instuction type and get the required target address correspondingly.
@@ -70,13 +62,12 @@ def pass2(prog,SYMTAB):
 			if '#' in prog[i][3]:
 			#Immediate addressing.
 				operand=prog[i][3].strpi('#')
-<<<<<<< HEAD
 				b=bin((int(operand,16)))[2:].zfill(20)
 
 			elif '@' in prog[i][3]:
 			#Indirect addressing.
 				operand=prog[i][3].strip('@')
-				b=(bin((int(SYMTAB[operand],16)))[2:].zfill(20)
+				b=(bin(int(SYMTAB[operand],16)))[2:].zfill(20)
 				
 
 			else:
@@ -114,11 +105,4 @@ def pass2(prog,SYMTAB):
 			disp=bin(disp).zfill(12)
 			bin_str+=disp
 
-		#NOW TIME FOR TYPE 2... -_-
-=======
-				b=bin((int(operand,16))[2:].zfill(20)
-
-		if prog[i][-1]=='3':
-		#Type 3. Need to calculate Displacement. -_-
-
->>>>>>> fe777b66e49b8b8b0b16a5caccab7379dbe0125b
+		#TYPE 2
