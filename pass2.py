@@ -1,0 +1,106 @@
+#Pass-2 of the SIC-XE assebbler. Takes the intermediate format and SYMTAB as input and writes the object file.
+
+
+#This functions decides all the flags for an instruction. Takes a line of code as input returns a sring 'nixbpe'
+def getFlag(line,disp):
+	n=i=x=b=p=e=0
+	#If '#' in operands then it's intermediate addressing.
+	if '#' in line[3]:
+		i=1
+	#if '@' in operands then it's indirect addressing.
+	elif '@' in line[3]:
+		n=1
+	#For type-3 'n' and 'i' both are 1.
+	elif line[5]==3:
+		n=i=1
+	#For indexed addressing.
+	if ',X' in line[3]:
+		x=1
+	#Decide whether base relative or PC relative.
+	if disp=='p':
+		p=1
+	elif disp=='b':
+		b=1
+	#For type-4 e=1.
+	if line[5]==4:
+		e=1
+	flag=str(n)+str(i)+str(x)+str(b)+str(p)+str(e)
+	return flag
+	
+	
+def pass2(prog,SYMTAB):
+	for i in range(len(prog)):
+
+		#If the instruction has a machine code convert to 6 bit binary.
+		if prog[i][4]!='':
+			bin_str= bin(int(prog[i][4],16))[2:].zfill(len(prog[i][4]*4))[:6]
+			print bin_str
+
+		#Flag needs to be checked and flag needs to be aded to bin_string..
+			flags=getFlag(prog[i],'p')
+			bin_str+=flags
+			print bin_str
+		#
+
+		#Check instuction type and get the required target address correspondingly.
+		'''elif len(operand)==0:
+                        a[1]=1+10
+                        a[3]=1          #type 1
+                elif operand.split(',')[0] in 'BSTFAXL':
+                        a[1]=2+10
+                        a[3]=2          #typ2
+                else:
+                        a[1]=3+10
+                        a[3]=3          #type 3'''
+		
+		b=''
+		if prog[i][-1]=='4':
+		#For type four 20 bit address.
+
+			if '#' in prog[i][3]:
+			#Immediate addressing.
+				operand=prog[i][3].strpi('#')
+				b=bin((int(operand,16)))[2:].zfill(20)
+
+			elif '@' in prog[i][3]:
+			#Indirect addressing.
+				operand=prog[i][3].strip('@')
+				b=(bin((int(SYMTAB[operand],16)))[2:].zfill(20)
+				
+
+			else:
+			#Normal addressing..
+				operand=prog[i][3]
+				b=bin(int((operand,16)))[2:].zfill(20)
+		
+		#TYPE 3
+		disp=0
+		if prog[i][-1]=='3':
+		#Type 3. Need to calculate Displacement. -_-
+			if '#' in prog[i][3]:
+			#Immediate addressing.
+				operand=prog[i][3].strpi('#')
+				disp=int(operand,16)
+
+			elif '@' in prog[i][3]:
+			#Indirect addressing.
+				operand=prog[i][3].strip('@')
+				disp=prog[i+1][0]-int(SYMTAB[operand],16)
+				
+
+			else:
+			#Normal addressing.
+				disp=prog[i+1][0]-int(SYMTAB[prog[i][3]],16)
+
+			#RANGE OF DISP NEEDS TO BE CHECKED HERE.
+			#AND DEPENDING ON THE RANGE FLAG P/B has to be set..
+			#DO IT LATER -_-
+			#CRAP
+			#AND ALSO YOU HAVEN'T HANDLED LAST LINE WHILE CALCULATING DISPLACEMENT... lazy bugger..
+
+
+			#Convert disp to binary and add to bin_srting..
+			disp=bin(disp).zfill(12)
+			bin_str+=disp
+
+		#NOW TIME FOR TYPE 2... -_-
