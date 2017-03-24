@@ -26,8 +26,9 @@ def getFlag(line,disp):
 	flag=str(n)+str(i)+str(x)+str(b)+str(p)+str(e)
 	return flag
 	
-	
+#Pass-2 method..!s	
 def pass2(prog,SYMTAB):
+	sym={'B':01,'S':02,'T':03,'F':04,'A':05,'X':05,'L':06}
 	for i in range(len(prog)):
 
 		#If the instruction has a machine code convert to 6 bit binary.
@@ -35,15 +36,7 @@ def pass2(prog,SYMTAB):
 			bin_str= bin(int(prog[i][4],16))[2:].zfill(len(prog[i][4]*4))[:6]
 			print bin_str
 
-		#Flag needs to be checked and flag needs to be aded to bin_string..
-			flags=getFlag(prog[i],'p')
-			bin_str+=flags
-			print bin_str
-
-		#Flag needs to be checked and flag needs to be aded to binstring..
-		#I have this code in my laptop.. Just have to copy paste.
-		#
-
+	
 		#Check instuction type and get the required target address correspondingly.
 		'''elif len(operand)==0:
                         a[1]=1+10
@@ -56,12 +49,18 @@ def pass2(prog,SYMTAB):
                         a[3]=3          #type 3'''
 		
 		b=''
-		if prog[i][-1]=='4':
+		if prog[i][-1]==4:
 		#For type four 20 bit address.
+
+		#Flag needs to be checked and flag needs to be aded to bin_string..
+			flags=getFlag(prog[i],'p')
+			bin_str+=flags
+			print bin_str
+
 
 			if '#' in prog[i][3]:
 			#Immediate addressing.
-				operand=prog[i][3].strpi('#')
+				operand=prog[i][3].strip('#')
 				b=bin((int(operand,16)))[2:].zfill(20)
 
 			elif '@' in prog[i][3]:
@@ -77,32 +76,60 @@ def pass2(prog,SYMTAB):
 		
 		#TYPE 3
 		disp=0
-		if prog[i][-1]=='3':
+		if prog[i][-1]==3:
 		#Type 3. Need to calculate Displacement. -_-
+		#Flag needs to be checked and flag needs to be aded to bin_string..
+			flags=getFlag(prog[i],'p')
+			bin_str+=flags
+			print bin_str
+
 			if '#' in prog[i][3]:
 			#Immediate addressing.
-				operand=prog[i][3].strpi('#')
+				operand=prog[i][3].strip('#')
 				disp=int(operand,16)
 
 			elif '@' in prog[i][3]:
 			#Indirect addressing.
 				operand=prog[i][3].strip('@')
-				disp=prog[i+1][0]-int(SYMTAB[operand],16)
+				if i<len(prog)-1:
+					disp=int(SYMTAB[operand],16)-int(prog[i+1][0],16)
+				else:
+					disp=int(SYMTAB[operand],16)-int(prog[i][0],16)
 				
 
 			else:
 			#Normal addressing.
-				disp=prog[i+1][0]-int(SYMTAB[prog[i][3]],16)
+				if i<len(prog):
+					disp=int(SYMTAB[prog[i][3]],16)-int(prog[i+1][0],16)
+				else:
+					disp=int(SYMTAB[prog[i][3]],16)-int(prog[i][0],16)
 
 			#RANGE OF DISP NEEDS TO BE CHECKED HERE.
 			#AND DEPENDING ON THE RANGE FLAG P/B has to be set..
 			#DO IT LATER -_-
 			#CRAP
-			#AND ALSO YOU HAVEN'T HANDLED LAST LINE WHILE CALCULATING DISPLACEMENT... lazy bugger..
 
 
 			#Convert disp to binary and add to bin_srting..
-			disp=bin(disp).zfill(12)
+			if disp>0:
+				disp=bin(disp)[2:].zfill(12)
+			else:
+				disp='blah'
+				#HANDLE HERE> Have to get 2's complement..!
 			bin_str+=disp
-
+			print bin_str
 		#TYPE 2
+		if prog[i][-1]==2:
+			#Type 2. Get code for registers. 8 bit opcode and 8 bit register code.
+			reg=prog[i][3].split(',')
+			reg_code1=sym[reg[0]]
+			reg_code2=sym[reg[1]]
+			bin_str=bin(int(prog[i][4],16))[2:].zfill(len(prog[i][4]*4))[:8]
+			bin_str+=bin(reg_code1)[2:].zfill(4)+bin(reg_code2)[2:].zfill(4)
+			print bin_str
+			#DONE  B-).. i mean type 2.. -_-
+
+		if prog[i][-1]==1 and prog[i][2]!='BASE':
+			bin_str=bin(int(prog[i][4],16))[2:].zfill(8)
+			print bin_str
+	
