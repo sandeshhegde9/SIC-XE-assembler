@@ -118,18 +118,54 @@ def pass2(prog,SYMTAB):
 				#HANDLE HERE> Have to get 2's complement..!
 			bin_str+=disp
 			print bin_str
-		#TYPE 2
-		if prog[i][-1]==2:
-			#Type 2. Get code for registers. 8 bit opcode and 8 bit register code.
-			reg=prog[i][3].split(',')
-			reg_code1=sym[reg[0]]
-			reg_code2=sym[reg[1]]
-			bin_str=bin(int(prog[i][4],16))[2:].zfill(len(prog[i][4]*4))[:8]
-			bin_str+=bin(reg_code1)[2:].zfill(4)+bin(reg_code2)[2:].zfill(4)
-			print bin_str
-			#DONE  B-).. i mean type 2.. -_-
 
-		if prog[i][-1]==1 and prog[i][2]!='BASE':
-			bin_str=bin(int(prog[i][4],16))[2:].zfill(8)
+			#TYPE 2
+			if prog[i][-1]==2:
+				#Type 2. Get code for registers. 8 bit opcode and 8 bit register code.
+				reg=prog[i][3].split(',')
+				reg_code1=sym[reg[0]]
+				reg_code2=sym[reg[1]]
+				bin_str=bin(int(prog[i][4],16))[2:].zfill(len(prog[i][4]*4))[:8]
+				bin_str+=bin(reg_code1)[2:].zfill(4)+bin(reg_code2)[2:].zfill(4)
+				print bin_str
+				#DONE  B-).. i mean type 2.. -_-
+
+			if prog[i][-1]==1 and prog[i][2]!='BASE':
+				bin_str=bin(int(prog[i][4],16))[2:].zfill(8)
+				print bin_str
+
+
+
+		#NOW HANDLE VARIABLE DECLERATION and blah blah.....
+		if prog[i][2] in ['BYTE','WORD','RESW','RESB']:
+			#Variable Decleration or array..
+			if prog[i][2]=='WORD':
+				dat=prog[i][3].split(',')
+				bin_str=''
+				for j in range(len(dat)):
+					dat[j]=int(dat[j],16)
+					bin_str+=bin(dat[j])[2:].zfill(24)+'^'
+			if prog[i][2]=='BYTE':
+				dat=prog[i][3].split(',')
+				bin_str=''
+				for j in range(len(dat)):
+					dat[j]=int(dat[j],16)
+					bin_str+=bin(dat[j])[2:].zfill(8)+'^'
+
+			if prog[i][2]=='RESW':
+				bin_str=''
+				jh=int(prog[i][3])
+				for d in range(jh*24):
+					bin_str+=' '
+					if d%24==0 and d!=0:
+						bin_str+='^'
+
+			if prog[i][2]=='RESB':
+				bin_str=''
+				jh=int(prog[i][3])
+				for d in range(jh*8):
+					bin_str+=' '
+					if d%8==0 and d!=0:
+						bin_str+='^'
+
 			print bin_str
-	
