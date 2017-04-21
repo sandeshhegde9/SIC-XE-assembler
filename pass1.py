@@ -4,12 +4,14 @@
 #Writes the intermediate file. 
 
 import re
+import sys
 import pass2
 #Global Declaration.
 SYMTAB={}
-OPTAB={'AD':'18','ADDF':'58','ADDR':'90','AND':'40','CLEAR':'B4','COMP':'28','COMPF':'88','COMPR':'A0','DIV':'24','DIVF':'64','DIVR':'9C','FIX':'C4','FLOAT':'C0','HIO':'F4','J':'3C','JEQ':'30','JGT':'34','JLT':'38','JSUB':'48','LDA':'00','LDB':'68','LDCH':'50','LDF':'70','LDL':'08','LDS':'6C','LDT':'74','LDX':'04','LPS':'D0','MULF':'60','MULR':'98','NORM':'C8','OR':'44','RD':'D8','RMO':'AC','RSUB':'4C','SHIFTL':'A4','SHIFTR':'A8','SIO':'F0','SSK':'EC','STA':'0C','STB':'78','STCH':'54','STF':'80','STI':'D4','STL':'14','STS':'7C','STSW':'E8','STT':'84','STX':'10','SUB':'1C','SUBF':'5C','SUBR':'94','SVC':'B0','TD':'E0','TIO':'F8','TIX':'2C','TIXR':'B8','WD':'DC'}
+OPTAB={'ADD':'18','ADDF':'58','ADDR':'90','AND':'40','CLEAR':'B4','COMP':'28','COMPF':'88','COMPR':'A0','DIV':'24','DIVF':'64','DIVR':'9C','FIX':'C4','FLOAT':'C0','HIO':'F4','J':'3C','JEQ':'30','JGT':'34','JLT':'38','JSUB':'48','LDA':'00','LDB':'68','LDCH':'50','LDF':'70','LDL':'08','LDS':'6C','LDT':'74','LDX':'04','LPS':'D0','MULF':'60','MULR':'98','NORM':'C8','OR':'44','RD':'D8','RMO':'AC','RSUB':'4C','SHIFTL':'A4','SHIFTR':'A8','SIO':'F0','SSK':'EC','STA':'0C','STB':'78','STCH':'54','STF':'80','STI':'D4','STL':'14','STS':'7C','STSW':'E8','STT':'84','STX':'10','SUB':'1C','SUBF':'5C','SUBR':'94','SVC':'B0','TD':'E0','TIO':'F8','TIX':'2C','TIXR':'B8','WD':'DC'}
 LOCTR=0
 prog=[]
+st_ads=0
 
 #The 'checkSYMTAB()' function. checks if a symbol is present in the Global SYMTAB.
 #If already present returns error. else inserts symbol and its address to SYMTAB.
@@ -47,7 +49,7 @@ def checkSYMTAB(symbol,opcode,operator):
 			#Get the value and length to store in SYMTAB.
 			values=operator.split(',')
 			length=len(values)
-			for values in values:
+			for value in values:
 				val.append(value)
 			#Yet to check for right syntax (num,num,num)
 
@@ -87,6 +89,7 @@ def pass1(program):
 	f1=open('intermediate','w')
 	global LOCTR
 	global prog
+	global st_ads
 	st_ads=0
 	lineno=1
 	opflag=[0,0,'',0]
@@ -134,14 +137,42 @@ def pass1(program):
 		lineno+=1
 
 
+
+def writeObject(string,f,name,length,st):
+	#Prepare the header and write to object file.
+	st=name+'^'+str(st)+'^'+str(length)[2:]+'\n'
+	f.write(st)
+	string=string.split('|')
+	for i in range(99999):
+		try:string.remove('')
+		except:break
+	st=''
+	count=0
+	for item in string:
+		if count<=60:
+			st+=str(item)+'^'
+			count+=len(item)
+		else:
+			s='T^'+str(hex(count)[2:4])+st
+
+			s=s.strip('^')
+			s+='\n'
+			f.write(s)
+			st=''
+			count=0
+
 def main():
-	f=open('pgm','r')
+	f=open(sys.argv[1],'r')
 	pass1(f)
 	global SYMTAB
+	global st_ads
 	f2=open('symtab','w')
-	print SYMTAB
-	print prog
-	pass2.pass2(prog,SYMTAB)
+	#print SYMTAB
+	#print prog
+	string=pass2.pass2(prog,SYMTAB)
+	output=open("objectfile2",'w')
+	#print type(LOCTR),type(st_ads)
+	writeObject(string,output,sys.argv[1],hex(LOCTR-st_ads),st_ads)
 	for key in SYMTAB:
 		f2.write(key+'\t'+str(SYMTAB[key])+'\n')
 
